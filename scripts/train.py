@@ -5,7 +5,9 @@ import torch
 from torch.optim import AdamW
 import wandb
 import numpy as np
+import argparse
 
+wandb.login()
 
 class ProteinDataset(Dataset):
     def __init__(self, file, tokenizer):
@@ -59,19 +61,32 @@ training_args = TrainingArguments(
     save_strategy='epoch',
     metric_for_best_model='eval/loss',
     save_total_limit = 5,
-    gradient_accumulation_steps=2
+    gradient_accumulation_steps=2,
+    report_to="wandb"
 )
 
-train_dataset = ProteinDataset("train.csv", tokenizer)
-test_dataset = ProteinDataset("test.csv", tokenizer)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--wandb_entity", type=str,required=True, help="please enter wandb entity name")
+    parser.add_argument("--wandb_project", type=str,required=True, help="please enter wandb project name")
+    parser.add_argument("--train_data", type=str,required=True, help="please enter traning data path")
+    parser.add_argument("--test_data", type=str,required=True, help="please enter test data path")
+    args = parser.parse_args()
+    
 
+    with wandb.init(entity=args.wandb_entity, project=args.wandb_project, job_type="upload-dataset") as run:
+        train_dataset = ProteinDataset(args.train_data, tokenizer)
+        test_dataset = ProteinDataset(args.test_data, tokenizer)
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=test_dataset,
+            optimizers=(AdamW(model.parameters(), lr=lr), None),
+        )
 
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=test_dataset,
-    optimizers=(AdamW(model.parameters(), lr=lr), None),
-)
+    trainer.train() 
 
-trainer.train()
+if __name__ == "__main__":
+    main()
+
