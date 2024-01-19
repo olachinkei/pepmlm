@@ -6,7 +6,9 @@ from torch.optim import AdamW
 import wandb
 import numpy as np
 import argparse
+import os
 
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"
 wandb.login()
 
 class ProteinDataset(Dataset):
@@ -59,7 +61,7 @@ training_args = TrainingArguments(
     evaluation_strategy="epoch",
     load_best_model_at_end=True,
     save_strategy='epoch',
-    metric_for_best_model='eval/loss',
+    metric_for_best_model='loss',
     save_total_limit = 5,
     gradient_accumulation_steps=2,
     report_to="wandb"
@@ -84,9 +86,7 @@ def main():
             eval_dataset=test_dataset,
             optimizers=(AdamW(model.parameters(), lr=lr), None),
         )
-
-    trainer.train() 
+        trainer.train() 
 
 if __name__ == "__main__":
     main()
-
