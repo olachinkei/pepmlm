@@ -16,7 +16,7 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM
 tokenizer = AutoTokenizer.from_pretrained("TianlaiChen/PepMLM-650M")
 model = AutoModelForMaskedLM.from_pretrained("TianlaiChen/PepMLM-650M")
 ```
-Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
 
 # Points to be added in this forked repository
 - add wandb integration into train.py
@@ -43,6 +43,7 @@ python3 scripts/generation_example.py --wandb_entity <wandb entity> --wandb_proj
 ```
 
 # License
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
 
