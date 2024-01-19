@@ -18,6 +18,30 @@ model = AutoModelForMaskedLM.from_pretrained("TianlaiChen/PepMLM-650M")
 ```
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
+# Points to be added in this forked repository
+- add wandb integration into train.py
+- create generation_example.py where the candidates of binders and the predicted structured are shown up in wandb dashboard
+- add environment.yml of esmfold
+
+## how to use 
+```
+# create environment
+conda env create -f environment.yml
+conda activate esmfold
+pip install "fair-esm[esmfold]"
+pip install 'dllogger @ git+https://github.com/NVIDIA/dllogger.git'
+pip install 'openfold @ git+https://github.com/aqlaboratory/openfold.git@4b41059694619831a7db195b7e0988fc4ff3a307'
+
+
+# run training
+python3 scripts/train.py --wandb_entity <wandb entity> --wandb_project <wandb project> --train_data ./scripts/data/gen_650M.csv --test_data ./scripts/data/test.csv
+# ex: python3 scripts/train.py --wandb_entity wandb-japan --wandb_project pepmlm --train_data ./scripts/data/gen_650M.csv --test_data ./scripts/data/test.csv 
+
+# generate binders
+python3 scripts/generation_example.py --wandb_entity <wandb entity> --wandb_project <wandb project> --artifacts_path <fined model's artifact path > --protein_seq <your sequence data>
+# ex: python3 scripts/generation_example.py --wandb_entity wandb-japan --wandb_project pepmlm --artifacts_path wandb-japan/pepmlm/model-4xrpjde9:v0 --protein_seq MSGIALSRLAQERKAWRKDHPFGFVAVPTKNPDGTMNLMNWECAIPGKKGTPWEGGLFKLRMLFKDDYPSSPPKCKFEPPLFHPNVYPSGTVCLSILEEDKDWRPAITIKQILLGIQELLNEPNIQDPAQAEAYTIYCQNRVEYEKRVRAQAKKFAPS
+```
+
 # License
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
