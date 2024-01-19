@@ -44,36 +44,48 @@ class ProteinDataset(Dataset):
         return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
         
 
-
-model_name = "esm2_t33_650M_UR50D"
-model = EsmForMaskedLM.from_pretrained("facebook/" + model_name)
-tokenizer = AutoTokenizer.from_pretrained("facebook/" + model_name)
-lr = 0.0007984276816171436
-
-training_args = TrainingArguments(
-    output_dir='./output/',
-    num_train_epochs = 5,
-    per_device_train_batch_size = 2,
-    per_device_eval_batch_size = 16,
-    warmup_steps = 501,
-    logging_dir='./logs',
-    logging_steps=10,
-    evaluation_strategy="epoch",
-    load_best_model_at_end=True,
-    save_strategy='epoch',
-    metric_for_best_model='loss',
-    save_total_limit = 5,
-    gradient_accumulation_steps=2,
-    report_to="wandb"
-)
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--wandb_entity", type=str,required=True, help="please enter wandb entity name")
     parser.add_argument("--wandb_project", type=str,required=True, help="please enter wandb project name")
     parser.add_argument("--train_data", type=str,required=True, help="please enter traning data path")
     parser.add_argument("--test_data", type=str,required=True, help="please enter test data path")
+    parser.add_argument("--model_name", default="esm2_t33_650M_UR50D", type=str)
+    parser.add_argument("--lr", default=0.0007984276816171436, type=float)
+    parser.add_argument("--num_train_epochs", default=5, type=int)
+    parser.add_argument("--per_device_train_batch_size", default=2, type=int)
+    parser.add_argument("--per_device_eval_batch_size", default=16, type=int)
+    parser.add_argument("--warmup_steps", default=501, type=int)
+    parser.add_argument("--logging_steps", default=10, type=int)
+    parser.add_argument("--evaluation_strategy", default="epoch", type=str)
+    parser.add_argument("--load_best_model_at_end", default=True, type=bool)
+    parser.add_argument("--save_strategy", default="epoch", type=str)
+    parser.add_argument("--metric_for_best_model", default="loss", type=str)
+    parser.add_argument("--save_total_limit", default=5, type=int)
+    parser.add_argument("--gradient_accumulation_steps", default=2, type=int)
     args = parser.parse_args()
+
+    model_name = args.model_name
+    model = EsmForMaskedLM.from_pretrained("facebook/" + model_name)
+    tokenizer = AutoTokenizer.from_pretrained("facebook/" + model_name)
+    lr = args.lr
+    
+    training_args = TrainingArguments(
+        output_dir='./output/',
+        num_train_epochs=args.num_train_epochs,
+        per_device_train_batch_size=args.per_device_train_batch_size,
+        per_device_eval_batch_size=args.per_device_eval_batch_size,
+        warmup_steps=args.warmup_steps,
+        logging_dir='./logs',
+        logging_steps=args.logging_steps,
+        evaluation_strategy=args.evaluation_strategy,
+        load_best_model_at_end=args.load_best_model_at_end,
+        save_strategy=args.save_strategy,
+        metric_for_best_model=args.metric_for_best_model,
+        save_total_limit=args.save_total_limit,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        report_to="wandb"
+    )
     
 
     with wandb.init(entity=args.wandb_entity, project=args.wandb_project, job_type="training") as run:
