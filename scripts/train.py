@@ -76,7 +76,7 @@ def main():
     args = parser.parse_args()
     
 
-    with wandb.init(entity=args.wandb_entity, project=args.wandb_project, job_type="upload-dataset") as run:
+    with wandb.init(entity=args.wandb_entity, project=args.wandb_project, job_type="training") as run:
         train_dataset = ProteinDataset(args.train_data, tokenizer)
         test_dataset = ProteinDataset(args.test_data, tokenizer)
         trainer = Trainer(
