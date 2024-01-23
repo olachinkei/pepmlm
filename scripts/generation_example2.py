@@ -4,6 +4,7 @@ import argparse
 import torch
 import numpy as np
 import pandas as pd
+import esm
 
 
 
@@ -126,7 +127,22 @@ def main():
         tokenizer = AutoTokenizer.from_pretrained("TianlaiChen/PepMLM-650M")
         results_df = generate_peptide(args.protein_seq, model, tokenizer, peptide_length=15, top_k=3, num_binders=5)
         
-        wandb_table = wandb.Table(dataframe=results_df)
+        wandb_table = wandb.Table(columns=['Binder', 'Pseudo Perplexity','Predicted Structure'])
+        model_esm_fold = esm.pretrained.esmfold_v1()
+        model_esm_fold = model_esm_fold.eval().cuda()
+
+        for index, row in results_df.iterrows():
+            binder = row['Binder']
+            pseudo_perplexity = row['Pseudo Perplexity']
+
+            with torch.no_grad():
+                output = model_esm_fold.infer_pdb(binder)
+
+            pdb_filename = f"result_{binder}.pdb"
+            with open(pdb_filename, "w") as f:
+                f.write(output)
+
+            wandb_table.add_data(binder, pseudo_perplexity, wandb.Molecule(pdb_filename))
         wandb.log({'predictions': wandb_table})
 
 if __name__ == "__main__":
