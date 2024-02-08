@@ -114,16 +114,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--wandb_entity", type=str,required=True, help="please enter wandb entity name")
     parser.add_argument("--wandb_project", type=str,required=True, help="please enter wandb project name")
-    parser.add_argument("--protein_seq", type=str,required=True, help="please enter wandb project name")
-    parser.add_argument("--artifacts_path", type=str,required=True, help="artifacts_path")
+    parser.add_argument("--protein_seq", type=str,required=True, help="please enter protein seq")
+    parser.add_argument("--tokenizer_path", type=str,required=True, help="please enter tokinizer path")
+    parser.add_argument("--model_artifacts_path", type=str,required=True, help="artifacts_path")
     args = parser.parse_args()
 
     with wandb.init(entity=args.wandb_entity, project=args.wandb_project, job_type="inference") as run:
-        artifact_model = run.use_artifact(args.artifacts_path)
+        artifact_model = run.use_artifact(args.model_artifacts_path)
         model_path = artifact_model.download()
 
-        model = AutoModelForMaskedLM.from_pretrained(model_path)
-        tokenizer = AutoTokenizer.from_pretrained("TianlaiChen/PepMLM-650M")
+        model = AutoModelForMaskedLM.from_pretrained(model_artifacts_path)
+        tokenizer = AutoTokenizer.from_pretrained(tokinizer_path)
         results_df = generate_peptide(args.protein_seq, model, tokenizer, peptide_length=15, top_k=3, num_binders=5)
         
         wandb_table = wandb.Table(dataframe=results_df)
