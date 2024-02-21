@@ -123,8 +123,8 @@ def main():
         artifact_model = run.use_artifact(args.model_artifacts_path)
         model_path = artifact_model.download()
 
-        model = AutoModelForMaskedLM.from_pretrained(model_artifacts_path)
-        tokenizer = AutoTokenizer.from_pretrained(tokinizer_path)
+        model = AutoModelForMaskedLM.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
         results_df = generate_peptide(args.protein_seq, model, tokenizer, peptide_length=15, top_k=3, num_binders=5)
         
         wandb_table = wandb.Table(dataframe=results_df)
