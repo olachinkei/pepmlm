@@ -1,4 +1,4 @@
-name: esmfold
+name: esm
 channels:
   - conda-forge
   - bioconda
